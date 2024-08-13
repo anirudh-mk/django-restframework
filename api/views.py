@@ -38,7 +38,6 @@ class Login(APIView):
             )
 
         if username == 'anirudh' and password == '1234':
-
             return Response(
                 data={
                     "success": "user logined successfully",
@@ -58,9 +57,14 @@ class BooksAPI(APIView):
     def get(self, request, id=None):
         if id:
             books_queryset = Books.objects.filter(id=id).first()
-            print(books_queryset)
             return Response(
-                data=books_queryset,
+                data={
+                    "name": books_queryset.name,
+                    "published_year": books_queryset.published_year,
+                    "pages": books_queryset.pages,
+                    "author": books_queryset.author,
+                    "price": books_queryset.price
+                },
                 status=status.HTTP_200_OK
             )
 
@@ -68,5 +72,32 @@ class BooksAPI(APIView):
 
         return Response(
             data=books,
+            status=status.HTTP_200_OK
+        )
+
+    def post(self, request):
+        name = request.data.get('name')
+        published_year = request.data.get('year')
+        pages = request.data.get('pages')
+        author = request.data.get('author')
+        price = request.data.get('price')
+
+        if name is None:
+            return Response(
+                data="name is required",
+                status=status.HTTP_200_OK
+            )
+
+        books = Books(
+            name=name,
+            published_year=published_year,
+            pages=pages,
+            author=author,
+            price=price
+        )
+        books.save()
+
+        return Response(
+            data="book created succssfully",
             status=status.HTTP_200_OK
         )
