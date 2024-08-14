@@ -1,3 +1,5 @@
+import math
+
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -5,6 +7,8 @@ from rest_framework import status
 
 from api.models import Books
 from api.serializer import BookSerializer
+
+from rest_framework.pagination import PageNumberPagination
 
 
 # Create your views here.
@@ -106,6 +110,9 @@ class BooksAPI(APIView):
 
 class BookAPI(APIView):
     def get(self, request, id=None):
+
+        page_no = request.GET.get('page')
+
         if id:
             book_queryset = Books.objects.filter(id=id).first()
             serializer = BookSerializer(book_queryset, many=False)
@@ -115,9 +122,19 @@ class BookAPI(APIView):
             )
 
         book_queryset = Books.objects.all()
-        serializer = BookSerializer(book_queryset, many=True)
+
+        paginator = PageNumberPagination()
+        paginator.page_size = 2
+        page = paginator.paginate_queryset(book_queryset, request)
+        total_pages = math.ceil(book_queryset.count()/2)
+        serializer = BookSerializer(page, many=True)
         return Response(
-            data=serializer.data,
+            data={
+                'response': serializer.data,
+                'current_page': page_no,
+                'total_response': book_queryset.count(),
+                'total_pages': total_pages
+            },
             status=status.HTTP_200_OK
         )
 
