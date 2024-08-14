@@ -136,3 +136,24 @@ class BookAPI(APIView):
             status=status.HTTP_200_OK
         )
 
+    def patch(self, request, id):
+
+        books_queryset = Books.objects.filter(id=id).first()
+
+        if books_queryset is None:
+            return Response(
+                data='book not found',
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        serializer = BookSerializer(books_queryset, data=request.data, partial=True)
+        if serializer.is_valid():
+            response = serializer.save()
+            return Response(
+                data=f'{response.name} edited successfully',
+                status=status.HTTP_200_OK
+            )
+        return Response(
+            data=serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
