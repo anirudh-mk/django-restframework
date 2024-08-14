@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from api.models import Books
+from api.serializer import BookSerializer
 
 
 # Create your views here.
@@ -101,3 +102,37 @@ class BooksAPI(APIView):
             data="book created succssfully",
             status=status.HTTP_200_OK
         )
+
+
+class BookAPI(APIView):
+    def get(self, request, id=None):
+        if id:
+            book_queryset = Books.objects.filter(id=id).first()
+            serializer = BookSerializer(book_queryset, many=False)
+            return Response(
+                data=serializer.data,
+                status=status.HTTP_200_OK
+            )
+
+        book_queryset = Books.objects.all()
+        serializer = BookSerializer(book_queryset, many=True)
+        return Response(
+            data=serializer.data,
+            status=status.HTTP_200_OK
+        )
+
+    def post(self, requset):
+
+        serializer = BookSerializer(data=requset.data)
+        if serializer.is_valid():
+            serializer.save()
+
+            return Response(
+                data='book created successfully',
+                status=status.HTTP_200_OK
+            )
+        return Response(
+            data=serializer.errors,
+            status=status.HTTP_200_OK
+        )
+
