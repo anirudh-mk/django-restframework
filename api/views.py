@@ -157,3 +157,19 @@ class BookAPI(APIView):
             data=serializer.errors,
             status=status.HTTP_400_BAD_REQUEST
         )
+
+    def delete(self, request, id):
+        books_queryset = Books.objects.filter(id=id).first()
+
+        if books_queryset is None:
+            return Response(
+                data='book not found',
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        books_queryset.delete()
+
+        return Response(
+            data=f'book deleted successfully',
+            status=status.HTTP_200_OK
+        )
