@@ -11,4 +11,5 @@ urlpatterns = [
     path('book-serializer/<str:id>/', views.BookAPI.as_view()),
     path('user/create/', views.UserCreateAPI.as_view()),
     path('user/login/', views.UserLoginAPI.as_view()),
+    path('create/book/', views.BookCreateAPI.as_view()),
 ]

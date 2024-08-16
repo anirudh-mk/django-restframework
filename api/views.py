@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from api.models import Books
-from api.serializer import BookSerializer, UserCreateSerilizer
+from api.serializer import BookSerializer, UserCreateSerilizer, BookCreateSerializer
 
 from rest_framework.pagination import PageNumberPagination
 from django.contrib.auth import authenticate
@@ -235,5 +235,24 @@ class UserLoginAPI(APIView):
             data={
                 "error": "invalid username or password"
             },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+
+class BookCreateAPI(APIView):
+    def post(self, request):
+        serializer = BookCreateSerializer(
+            data=request.data,
+        )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                data={
+                    "success": "book created successfully"
+                },
+                status=status.HTTP_200_OK
+            )
+        return Response(
+            data=serializer.errors,
             status=status.HTTP_400_BAD_REQUEST
         )
