@@ -8,5 +8,7 @@ urlpatterns = [
     path('books/', views.BooksAPI.as_view()),
     path('books/<str:id>/', views.BooksAPI.as_view()),
     path('book-serializer/', views.BookAPI.as_view()),
-    path('book-serializer/<str:id>/', views.BookAPI.as_view())
+    path('book-serializer/<str:id>/', views.BookAPI.as_view()),
+    path('user/create/', views.UserCreateAPI.as_view()),
+    path('user/login/', views.UserLoginAPI.as_view()),
 ]

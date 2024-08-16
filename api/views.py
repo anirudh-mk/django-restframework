@@ -6,9 +6,10 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from api.models import Books
-from api.serializer import BookSerializer
+from api.serializer import BookSerializer, UserCreateSerilizer
 
 from rest_framework.pagination import PageNumberPagination
+from django.contrib.auth import authenticate
 
 
 # Create your views here.
@@ -126,7 +127,7 @@ class BookAPI(APIView):
         paginator = PageNumberPagination()
         paginator.page_size = 2
         page = paginator.paginate_queryset(book_queryset, request)
-        total_pages = math.ceil(book_queryset.count()/2)
+        total_pages = math.ceil(book_queryset.count() / 2)
         serializer = BookSerializer(page, many=True)
         return Response(
             data={
@@ -189,4 +190,50 @@ class BookAPI(APIView):
         return Response(
             data=f'book deleted successfully',
             status=status.HTTP_200_OK
+        )
+
+
+class UserCreateAPI(APIView):
+    def post(self, request):
+        serializer = UserCreateSerilizer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                data={
+                    "success": "User created successfully"
+                },
+                status=status.HTTP_200_OK
+            )
+        return Response(
+            data=serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+
+class UserLoginAPI(APIView):
+    def get(self, request):
+        username = request.data.get('username')
+        password = request.data.get('password')
+
+        if not username and password:
+            return Response(
+                data={
+                    "error": "please enter username and password"
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        user = authenticate(request, username=username, password=password)
+        if user:
+            return Response(
+                data={
+                    "success": "user Logined successfully"
+                },
+                status=status.HTTP_200_OK
+            )
+        return Response(
+            data={
+                "error": "invalid username or password"
+            },
+            status=status.HTTP_400_BAD_REQUEST
         )

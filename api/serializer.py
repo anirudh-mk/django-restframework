@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from api.models import Books
-
+from django.contrib.auth.models import User
 
 class BookSerializer(serializers.ModelSerializer):
     author_name = serializers.CharField(source='author.name', read_only=True)
@@ -34,3 +34,12 @@ class BookSerializer(serializers.ModelSerializer):
         if Books.objects.filter(name=name).exists():
             raise serializers.ValidationError('book already exists')
         return name
+
+
+class UserCreateSerilizer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['username', 'password']
+
+    def create(self, validated_data):
+        return User.objects.create_user(**validated_data)
